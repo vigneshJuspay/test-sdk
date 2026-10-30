@@ -67,3 +67,16 @@ jobs:
         with:
           name: test-results
           path: Example/TestResults.xcresult
+
+  readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: README examples match the example app
+        run: bash scripts/verify-readme.sh
+
+      - name: Lint README
+        uses: DavidAnson/markdownlint-cli2-action@v24
+        with:
+          globs: README.md
