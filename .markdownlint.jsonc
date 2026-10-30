@@ -1,0 +1,5 @@
+// Lint rules: everything on except line length, since sentences and code run long.
+{
+  "default": true,
+  "MD013": false
+}

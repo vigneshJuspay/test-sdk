@@ -1,0 +1,162 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [release]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint Podspec
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Environment info
+        run: |
+          xcodebuild -version
+          pod --version
+
+      - name: Lint pod (dynamic framework)
+        run: pod lib lint PeekKit.podspec --allow-warnings
+
+      - name: Lint pod (static framework)
+        run: pod lib lint PeekKit.podspec --allow-warnings --use-static-frameworks
+
+  test:
+    name: Build & Test Example App
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Environment info
+        run: |
+          xcodebuild -version
+          pod --version
+
+      - name: Public API matches PeekKit/api/PeekKit.api
+        run: bash scripts/api.sh check
+
+      - name: Install pods
+        working-directory: Example
+        run: pod install
+
+      - name: Run unit tests
+        working-directory: Example
+        run: |
+          set -o pipefail
+          DEVICE=$(xcrun simctl list devices available --json | jq -r '[.devices | to_entries[] | select(.key | contains("iOS")) | .value[] | select(.isAvailable and (.name | startswith("iPhone")))] | last | .name')
+          if [ -z "$DEVICE" ] || [ "$DEVICE" = "null" ]; then
+            echo "::error::No available iPhone simulator found on this runner"
+            xcrun simctl list devices
+            exit 1
+          fi
+          echo "Using simulator: $DEVICE"
+          xcodebuild clean test \
+            -workspace PeekKit.xcworkspace \
+            -scheme PeekKit-Example \
+            -destination "platform=iOS Simulator,name=$DEVICE" \
+            -resultBundlePath TestResults.xcresult \
+            CODE_SIGNING_ALLOWED=NO | xcbeautify
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: Example/TestResults.xcresult
+
+  spm:
+    name: Build & Test with Swift Package Manager
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      # _Pods.xcodeproj links to the CocoaPods project; while it sits in the root,
+      # xcodebuild builds that project instead of Package.swift.
+      - name: Use Package.swift as the root project
+        run: rm _Pods.xcodeproj
+
+      - name: Environment info
+        run: |
+          xcodebuild -version
+          xcodebuild -list
+
+      - name: Build and test the package
+        run: |
+          set -o pipefail
+          DEVICE=$(xcrun simctl list devices available --json | jq -r '[.devices | to_entries[] | select(.key | contains("iOS")) | .value[] | select(.isAvailable and (.name | startswith("iPhone")))] | last | .name')
+          if [ -z "$DEVICE" ] || [ "$DEVICE" = "null" ]; then
+            echo "::error::No available iPhone simulator found on this runner"
+            xcrun simctl list devices
+            exit 1
+          fi
+          echo "Using simulator: $DEVICE"
+          xcodebuild test \
+            -scheme PeekKit \
+            -destination "platform=iOS Simulator,name=$DEVICE" \
+            -derivedDataPath DerivedData \
+            CODE_SIGNING_ALLOWED=NO | xcbeautify
+
+      - name: Privacy manifest is in the package's resource bundle
+        run: |
+          MANIFEST=$(find DerivedData/Build/Products -path '*/PeekKit_PeekKit.bundle/PrivacyInfo.xcprivacy' -print -quit)
+          if [ -z "$MANIFEST" ]; then
+            echo "::error::PrivacyInfo.xcprivacy is missing from PeekKit_PeekKit.bundle"
+            exit 1
+          fi
+          echo "Found $MANIFEST"
+
+  xcframework:
+    name: XCFramework and SBOM
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Environment info
+        run: xcodebuild -version
+
+      # Ad-hoc signed: the same codesign and verify steps as a release, without the certificate.
+      - name: Build the XCFramework
+        env:
+          APPLE_DIST_IDENTITY: "-"
+        run: bash scripts/build-xcframework.sh 0.0.0
+
+      - name: Generate the SBOM
+        run: bash scripts/sbom.sh 0.0.0 > "$RUNNER_TEMP/PeekKit.cdx.json"
+
+  readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: README examples match the example app
+        run: bash scripts/verify-readme.sh
+
+      - name: Lint README
+        uses: DavidAnson/markdownlint-cli2-action@v24
+        with:
+          globs: |
+            README.md
+            docs/**/*.md
+
+  api-changes:
+    name: Public API changes match the version bump
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Public API changes match the version bump
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: bash scripts/check-api-changes.sh "$BASE_SHA" "$HEAD_SHA"
