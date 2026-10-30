@@ -34,6 +34,8 @@ pod 'PeekKit'
 
 See [Versioning](docs/versioning.md).
 
+What changed in each version is in [CHANGELOG.md](CHANGELOG.md).
+
 ### Signed XCFramework
 
 Every GitHub release also attaches a signed `PeekKit.xcframework.zip`, its SHA-256 checksum and a CycloneDX SBOM. See [Verify a release](docs/verify-release.md) for how to check them.

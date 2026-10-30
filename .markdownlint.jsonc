@@ -1,5 +1,7 @@
 // Markdown lint rules for this repo. Line length is off: prose and code samples run long.
+// Repeated headings are fine under different parents: CHANGELOG.md has a Features section per release.
 {
   "default": true,
-  "MD013": false
+  "MD013": false,
+  "MD024": { "siblings_only": true }
 }
