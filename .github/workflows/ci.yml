@@ -118,7 +118,12 @@ jobs:
       - name: README examples match the example app
         run: bash scripts/verify-readme.sh
 
-      - name: Lint README
+      - name: Error codes doc matches the SDK
+        run: bash scripts/verify-error-codes.sh
+
+      - name: Lint README and docs
         uses: DavidAnson/markdownlint-cli2-action@v24
         with:
-          globs: README.md
+          globs: |
+            README.md
+            docs/**/*.md
