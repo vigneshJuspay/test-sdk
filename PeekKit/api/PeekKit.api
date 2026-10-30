@@ -1,0 +1,11 @@
+typealias PeekHandler = (Swift.String) -> Swift.Void
+class Peeker: ObjectiveC.NSObject
+conformance Peeker: CVarArg
+conformance Peeker: CustomDebugStringConvertible
+conformance Peeker: CustomStringConvertible
+conformance Peeker: Equatable
+conformance Peeker: Hashable
+conformance Peeker: NSObjectProtocol
+Peeker.init()
+func Peeker.peek(from: UIKit.UIViewController, onStatus: PeekKit.PeekHandler)
+func isSecurePage(_: Foundation.URL) -> Swift.Bool

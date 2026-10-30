@@ -32,6 +32,12 @@ PeekKit is available through CocoaPods:
 pod 'PeekKit'
 ```
 
+See [Versioning](docs/versioning.md).
+
+### Signed XCFramework
+
+Every GitHub release also attaches a signed `PeekKit.xcframework.zip`, its SHA-256 checksum and a CycloneDX SBOM. See [Verify a release](docs/verify-release.md) for how to check them.
+
 ## Usage
 
 ```swift
@@ -49,11 +55,15 @@ Create one `Peeker` per screen and call `peek(from:onStatus:)` from a button. Th
 
 ### What your app receives
 
-`onStatus` is called with a short status string: `loaded <url>` when the page finishes, `failed: <reason>` when it does not, and `closed` when the person closes the sheet.
+`onStatus` is called with a short status string: `loaded <url>` when the page finishes, `failed: <reason>` when it does not, and `closed` when the person closes the sheet. When a failure has a code, it is listed in [Error codes](docs/error-codes.md).
 
 ### Close it yourself
 
 You do not need to. The sheet has its own close button, and PeekKit keeps no state between peeks.
+
+### Error codes
+
+The error codes PeekKit reports are listed in [Error codes](docs/error-codes.md).
 
 ## FAQ
 

@@ -39,6 +39,9 @@ jobs:
           xcodebuild -version
           pod --version
 
+      - name: Public API matches PeekKit/api/PeekKit.api
+        run: bash scripts/api.sh check
+
       - name: Install pods
         working-directory: Example
         run: pod install
@@ -110,6 +113,25 @@ jobs:
           fi
           echo "Found $MANIFEST"
 
+  xcframework:
+    name: XCFramework and SBOM
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Environment info
+        run: xcodebuild -version
+
+      # Ad-hoc signed: the same codesign and verify steps as a release, without the certificate.
+      - name: Build the XCFramework
+        env:
+          APPLE_DIST_IDENTITY: "-"
+        run: bash scripts/build-xcframework.sh 0.0.0
+
+      - name: Generate the SBOM
+        run: bash scripts/sbom.sh 0.0.0 > "$RUNNER_TEMP/PeekKit.cdx.json"
+
   readme:
     runs-on: ubuntu-latest
     steps:
@@ -118,7 +140,26 @@ jobs:
       - name: README examples match the example app
         run: bash scripts/verify-readme.sh
 
-      - name: Lint README
+      - name: Error codes doc matches the SDK
+        run: bash scripts/verify-error-codes.sh
+
+      - name: Lint README and docs
         uses: DavidAnson/markdownlint-cli2-action@v24
         with:
-          globs: README.md
+          globs: |
+            README.md
+            docs/**/*.md
+
+  api-changes:
+    name: Public API changes match the version bump
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Public API changes match the version bump
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: bash scripts/check-api-changes.sh "$BASE_SHA" "$HEAD_SHA"
