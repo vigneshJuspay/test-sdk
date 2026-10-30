@@ -166,6 +166,8 @@ jobs:
           echo "Releasing version: $VERSION"
 
       - name: Verify CocoaPods trunk authentication
+        id: trunk-auth
+        continue-on-error: true
         env:
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
         run: |
@@ -207,6 +209,9 @@ jobs:
           fi
 
       - name: Publish to CocoaPods trunk
+        id: trunk-push
+        if: steps.trunk-auth.outcome == 'success'
+        continue-on-error: true
         env:
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
           VERSION: ${{ steps.version.outputs.version }}
@@ -218,6 +223,9 @@ jobs:
           fi
 
       - name: Wait for CocoaPods CDN
+        id: trunk-cdn
+        if: steps.trunk-push.outcome == 'success'
+        continue-on-error: true
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
@@ -236,3 +244,9 @@ jobs:
 
           echo "::error::Trunk push succeeded but the CDN has not served PeekKit $VERSION after 20 minutes. Re-run this workflow to resume (all completed steps skip idempotently), or check https://cocoapods.org/pods/PeekKit"
           exit 1
+
+      - name: Warn when CocoaPods was not updated
+        if: steps.trunk-cdn.outcome != 'success'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: echo "::warning::PeekKit $VERSION is not on CocoaPods (trunk login, push or CDN did not succeed). The tag and GitHub release exist, so Swift Package Manager already serves this version. Re-run this workflow to retry CocoaPods."
