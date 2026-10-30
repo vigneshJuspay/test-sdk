@@ -4,6 +4,28 @@ PeekKit opens a random web page. You press a button, a page you did not ask for 
 
 ## Installation
 
+Add PeekKit with Swift Package Manager or CocoaPods. The Swift Package Manager route includes the privacy manifest (`PrivacyInfo.xcprivacy`).
+
+### Swift Package Manager
+
+In Xcode, choose **File > Add Package Dependencies**, enter this repository URL, choose **Up to Next Major Version** and add the `PeekKit` product to your app target.
+
+If your project is built from a `Package.swift`, add the package and depend on its `PeekKit` product:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/example/test-sdk.git", from: "<VERSION>")
+],
+targets: [
+    .target(
+        name: "<YOUR_TARGET>",
+        dependencies: [.product(name: "PeekKit", package: "test-sdk")]
+    )
+]
+```
+
+### CocoaPods
+
 PeekKit is available through CocoaPods:
 
 ```ruby
