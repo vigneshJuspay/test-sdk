@@ -19,6 +19,20 @@ peeker.peek(from: self) { status in
 }
 ```
 
+## Guide
+
+### Peek at a page
+
+Create one `Peeker` per screen and call `peek(from:onStatus:)` from a button. The page opens in a sheet with a close button.
+
+### What your app receives
+
+`onStatus` is called with a short status string: `loaded <url>` when the page finishes, `failed: <reason>` when it does not, and `closed` when the person closes the sheet.
+
+### Close it yourself
+
+You do not need to. The sheet has its own close button, and PeekKit keeps no state between peeks.
+
 ## FAQ
 
 **Which page will I get?** Nobody knows. That is the point.
