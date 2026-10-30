@@ -4,17 +4,11 @@ PeekKit opens a random web page. You press a button, a page you did not ask for 
 
 ## Installation
 
-### Swift Package Manager
-
-In Xcode, choose **File > Add Package Dependencies**, paste this repository's URL and add the `PeekKit` library.
-
-### CocoaPods
+PeekKit is available through CocoaPods:
 
 ```ruby
 pod 'PeekKit'
 ```
-
-See [Versioning](docs/versioning.md).
 
 ## Usage
 
@@ -32,7 +26,3 @@ peeker.peek(from: self) { status in
 **Can I choose the page?** No. Choosing would make it a browser.
 
 **Is it useful?** It is mostly here so a release pipeline has something to build.
-
-## Signed XCFramework
-
-Every GitHub release also attaches a signed `PeekKit.xcframework.zip`, its SHA-256 checksum and a CycloneDX SBOM. See [Verify a release](docs/verify-release.md) for how to check them.
