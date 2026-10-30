@@ -1,0 +1,5 @@
+# Not used: GitHub Actions runs CI. Kept so the layout matches a typical CocoaPods library.
+language: swift
+osx_image: xcode16
+script:
+  - echo "see .github/workflows"

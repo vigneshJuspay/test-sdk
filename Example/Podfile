@@ -1,0 +1,11 @@
+use_frameworks!
+
+platform :ios, '12.0'
+
+target 'PeekKit_Example' do
+  pod 'PeekKit', :path => '../'
+
+  target 'PeekKit_Tests' do
+    inherit! :search_paths
+  end
+end

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="pk1-vc-001">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <scene sceneID="pk1-sc-001">
+            <objects>
+                <viewController id="pk1-vc-001" customClass="ViewController" customModule="PeekKit_Example" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="pk1-vw-001">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pk1-bt-001">
+                                <rect key="frame" x="120" y="318" width="135" height="30"/>
+                                <state key="normal" title="Peek at a random page"/>
+                                <connections>
+                                    <action selector="onPeekClick:" destination="pk1-vc-001" eventType="touchUpInside" id="pk1-ac-001"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="pk1-bt-001" firstAttribute="centerX" secondItem="pk1-vw-001" secondAttribute="centerX" id="pk1-cx-001"/>
+                            <constraint firstItem="pk1-bt-001" firstAttribute="centerY" secondItem="pk1-vw-001" secondAttribute="centerY" id="pk1-cy-001"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="pk1-sa-001"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="pk1-fr-001" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+    </scenes>
+</document>
